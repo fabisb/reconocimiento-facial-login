@@ -3,60 +3,65 @@
   <head>
     <title>Reconocimiento Facial</title>
   </head>
+  <link rel="stylesheet" href="/stylesheets/bootstrap.min.css">
+  <link rel="stylesheet" href="/stylesheets/style.css">
   <body>
-    <h1>Iniciar sesión con reconocimiento facial</h1>
-    <video id="video" autoplay></video>
-    <button id="capturar">Capturar</button>
-    <canvas id="canvas" width="320" height="240"></canvas>
-    <button id="autenticar">Autenticar</button>
+    <main>
+
+      <h1>Iniciar sesión con reconocimiento facial</h1>
+      <video id="video" autoplay></video>
+      <button id="capturar">Capturar</button>
+      <canvas id="canvas" width="320" height="240"></canvas>
+      <button >Autenticar</button>
+      <button id="autenticar" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#loginModal">
+        Launch demo modal
+      </button>
+    </main>
+    <!-- Button trigger modal -->
+
+
+<!-- Modal -->
+<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="loginModalLabel">Login...</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="bodyModalLogin">
+        <form id="loginForm" hidden>
+          <div class="mb-3">
+            <div class="text-center">
+            <figure class="figure">
+
+                <img id="imgMatch" src="/images/example.png" height="350px" class="figure-img img-fluid rounded" alt="...">
+                <figcaption id="labelMatch" class="figure-caption">...</figcaption>
+              </figure>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="exampleInputPassword1" class="form-label">Password</label>
+            <input type="password" class="form-control" id="exampleInputPassword1">
+          </div>
+       
+          <button type="submit" class="btn btn-primary">Ingresar</button>
+        </form>
+        
+        <div id="loadingSpinner" class="text-center">
+          <div class="spinner-border m-5" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
   </body>
   <script src="/modules/face-api.min.js"></script>
   <script src="/modules/axios.min.js"></script>
-  <script>
-    // Cargar modelos de face-api.js
-    async function cargarModelos() {
-      await faceapi.nets.tinyFaceDetector.loadFromUri("/models");
-      await faceapi.nets.faceLandmark68Net.loadFromUri("/models");
-      await faceapi.nets.faceRecognitionNet.loadFromUri("/models");
-    }
-
-    cargarModelos();
-
-    // Acceder a la cámara web
-    const video = document.getElementById("video");
-    const canvas = document.getElementById("canvas");
-    const context = canvas.getContext("2d");
-
-    async function iniciarCamara() {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      video.srcObject = stream;
-    }
-
-    iniciarCamara();
-
-    // Capturar una imagen de la cámara
-    const capturarBtn = document.getElementById("capturar");
-    const autenticarBtn = document.getElementById("autenticar");
-
-    let imagenCapturada = null;
-
-    capturarBtn.addEventListener("click", async () => {
-      context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-      // Procesar la imagen capturada
-      imagenCapturada = canvas.toDataURL();
-      console.log("🚀 ~ file: index.html:48 ~ capturarBtn.addEventListener ~ imagenCapturada:", imagenCapturada)
-    });
-
-    // Enviar la imagen al servidor para autenticación
-    autenticarBtn.addEventListener("click", async () => {
-      if (imagenCapturada) {
-        console.log("🚀 ~ file: index.html:53 ~ autenticarBtn.addEventListener ~ imagenCapturada:", imagenCapturada)
-        const data = await axios.post("/autenticar", { imagenCapturada });
-        console.log("🚀 ~ file: index.html:62 ~ autenticarBtn.addEventListener ~ data:", data);
-      } else {
-        alert("Capture una imagen primero.");
-      }
-    });
-  </script>
+  <script src="/js/reconocimientoFacial.js"></script>
+  <script src="/js/bootstrap.min.js"></script>
 </html>

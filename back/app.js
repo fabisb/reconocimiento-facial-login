@@ -19,15 +19,10 @@ app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
-const rutaModels = __dirname + "/models";
-console.log("🚀 ~ file: app.js:23 ~ rutaModels :", rutaModels);
-// Inicializar los modelos al iniciar la aplicación
-const { faceLandmark68Net, faceRecognitionNet, SsdMobilenetv1 } = faceapi.nets;
-async function cargarModelos() {
-  console.log("Modelos cargados.");
-}
+app.use(express.static(path.join(__dirname, "/api/modelos")));
 
-cargarModelos();
+const rutaModels = __dirname + "/models";
+
 const { Canvas, Image, ImageData } = canvas;
 faceapi.env.monkeyPatch({ Canvas, Image, ImageData });
 
@@ -39,44 +34,7 @@ app.use(bodyParser.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 
 // Cargar las imágenes de referencia al iniciar la aplicación
-const imageDir = "./modelos/";
-async function cargarImagenesDeReferencia() {
-  // Carga las imágenes de referencia desde la carpeta "modelos"
-  try {
-    // Carga las imágenes de referencia desde la carpeta "modelos"
-    const imageFiles = fs.readdirSync(imageDir);
-    const labeledDescriptors = [];
-
-    for (const imageFile of imageFiles) {
-      const label = imageFile.split(".").slice(0, -1).join(".");
-      const imagePath = path.join(imageDir, imageFile);
-      const imagenBinaria = fs.readFileSync(imagePath);
-      const imagenBase64 = imagenBinaria.toString("base64");
-
-      // Convertir el búfer a una matriz Float32Array
-      const faceInImg = await detectFaces(imagenBase64);
-      console.log("🚀 ~ file: app.js:61 ~ cargarImagenesDeReferencia ~ faceInImg:", faceInImg);
-      const results = await faceapi
-        .detectAllFaces(faceInImg)
-        .withFaceLandmarks()
-        .withFaceDescriptors();
-      console.log("🚀 ~ file: app.js:65 ~ cargarImagenesDeReferencia ~ results:", results);
-
-      if (!results.length) {
-        return;
-      }
-      // Crear una LabeledFaceDescriptors con la matriz Float32Array
-      //const labeledDescriptor = new faceapi.LabeledFaceDescriptors(label, [float32Array]);
-      labeledDescriptors.push(results);
-    }
-    console.log("Descriptores etiquetados:", labeledDescriptors);
-
-    faceMatcher = new faceapi.FaceMatcher(labeledDescriptors);
-    console.log("Imágenes de referencia cargadas.");
-  } catch (error) {
-    console.error("Error al cargar imágenes de referencia:", error);
-  }
-}
+const imageDir = "./api/modelos/";
 
 async function cargarImgRef() {
   await faceapi.nets.ssdMobilenetv1.loadFromDisk(rutaModels);
@@ -86,8 +44,8 @@ async function cargarImgRef() {
   const imageFiles = fs.readdirSync(imageDir);
   const modelosFaces = [];
   for (const imageFile of imageFiles) {
+    console.log("🚀 ~ file: app.js:47 ~ cargarImgRef ~ imageFile:", imageFile)
     const imagePath = path.join(imageDir, imageFile);
-    console.log("🚀 ~ file: app.js:93 ~ cargarImgRef ~ imagePath:", imagePath);
 
     const referenceImage = await canvas.loadImage(imagePath);
 
@@ -100,14 +58,10 @@ async function cargarImgRef() {
 
     // Almacena los descriptores faciales en modelosFaces
     modelosFaces.push(
-      new faceapi.LabeledFaceDescriptors(imageFile.split(".")[0], descriptorsArray)
+      new faceapi.LabeledFaceDescriptors(imageFile, descriptorsArray)
     );
   }
-  console.log("🚀 ~ file: app.js:99 ~ cargarImgRef ~ modelosFaces:", modelosFaces);
   faceMatcher = new faceapi.FaceMatcher(modelosFaces);
-  console.log("🚀 ~ file: app.js:106 ~ cargarImgRef ~ faceMatcher:", faceMatcher);
-  const labels = faceMatcher.labeledDescriptors.map((ld) => ld.label);
-  console.log("🚀 ~ file: app.js:107 ~ cargarImgRef ~ labels:", labels);
 }
 cargarImgRef(); // Llamada a la función al iniciar la aplicación
 
@@ -116,10 +70,7 @@ app.post("/autenticar", async (req, res) => {
   if (!faceMatcher) {
     return res.status(500).send("Cargue imágenes de referencia primero.");
   }
-
   const { imagenCapturada } = req.body;
-
-  // Convierte la imagen capturada en una imagen de face-api.js
 
   // Detecta caras en la imagen capturada
   try {
@@ -128,7 +79,6 @@ app.post("/autenticar", async (req, res) => {
       .detectSingleFace(resultsQuery)
       .withFaceLandmarks()
       .withFaceDescriptor();
-    console.log("🚀 ~ file: app.js:128 ~ app.post ~ detections:", detections);
 
     if (!detections) {
       return res.status(401).send("No se detectaron caras en la imagen capturada.");
@@ -136,11 +86,13 @@ app.post("/autenticar", async (req, res) => {
 
     // Compara las caras detectadas con las imágenes de referencia
     const bestMatch = faceMatcher.findBestMatch(detections.descriptor);
-    console.log("🚀 ~ file: app.js:103 ~ app.post ~ bestMatch:", bestMatch);
+    console.log("🚀 ~ file: app.js:94 ~ app.post ~ bestMatch:", bestMatch)
 
     // Si hay una coincidencia, el usuario está autenticado
     if (bestMatch.label !== "unknown") {
-      res.status(200).send(`Usuario autenticado como ${bestMatch.label}.`);
+      res
+        .status(200)
+        .send({ mensaje: `Usuario autenticado como ${bestMatch.label}.`, match: bestMatch.label });
     } else {
       res.status(401).send("No se pudo autenticar al usuario.");
     }
