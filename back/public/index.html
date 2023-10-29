@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Reconocimiento Facial</title>
+  </head>
+  <body>
+    <h1>Iniciar sesión con reconocimiento facial</h1>
+    <video id="video" autoplay></video>
+    <button id="capturar">Capturar</button>
+    <canvas id="canvas" width="320" height="240"></canvas>
+    <button id="autenticar">Autenticar</button>
+  </body>
+  <script src="/modules/face-api.min.js"></script>
+  <script src="/modules/axios.min.js"></script>
+  <script>
+    // Cargar modelos de face-api.js
+    async function cargarModelos() {
+      await faceapi.nets.tinyFaceDetector.loadFromUri("/models");
+      await faceapi.nets.faceLandmark68Net.loadFromUri("/models");
+      await faceapi.nets.faceRecognitionNet.loadFromUri("/models");
+    }
+
+    cargarModelos();
+
+    // Acceder a la cámara web
+    const video = document.getElementById("video");
+    const canvas = document.getElementById("canvas");
+    const context = canvas.getContext("2d");
+
+    async function iniciarCamara() {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      video.srcObject = stream;
+    }
+
+    iniciarCamara();
+
+    // Capturar una imagen de la cámara
+    const capturarBtn = document.getElementById("capturar");
+    const autenticarBtn = document.getElementById("autenticar");
+
+    let imagenCapturada = null;
+
+    capturarBtn.addEventListener("click", async () => {
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      // Procesar la imagen capturada
+      imagenCapturada = canvas.toDataURL();
+      console.log("🚀 ~ file: index.html:48 ~ capturarBtn.addEventListener ~ imagenCapturada:", imagenCapturada)
+    });
+
+    // Enviar la imagen al servidor para autenticación
+    autenticarBtn.addEventListener("click", async () => {
+      if (imagenCapturada) {
+        console.log("🚀 ~ file: index.html:53 ~ autenticarBtn.addEventListener ~ imagenCapturada:", imagenCapturada)
+        const data = await axios.post("/autenticar", { imagenCapturada });
+        console.log("🚀 ~ file: index.html:62 ~ autenticarBtn.addEventListener ~ data:", data);
+      } else {
+        alert("Capture una imagen primero.");
+      }
+    });
+  </script>
+</html>
