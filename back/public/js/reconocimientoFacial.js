@@ -51,6 +51,7 @@ autenticarBtn.addEventListener("click", async () => {
       document.getElementById("loginForm").hidden = false;
       document.getElementById("labelMatch").innerText = match.match.split(".")[0];
       document.getElementById("imgMatch").src = imagenCapturada;
+      document.getElementById('loginBtn').removeAttribute('disabled')
     } else {
       alert("Capture una imagen primero.");
     }
@@ -61,3 +62,7 @@ autenticarBtn.addEventListener("click", async () => {
     }
   }
 });
+
+const fotoLogin = async ()=>{
+
+}

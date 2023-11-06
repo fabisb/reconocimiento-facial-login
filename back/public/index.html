@@ -29,7 +29,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body" id="bodyModalLogin">
-        <form id="loginForm" hidden>
+        <form id="loginForm" onclick="fotoLogin()" hidden>
           <div class="mb-3">
             <div class="text-center">
             <figure class="figure">
@@ -40,11 +40,11 @@
             </div>
           </div>
           <div class="mb-3">
-            <label for="exampleInputPassword1" class="form-label">Password</label>
-            <input type="password" class="form-control" id="exampleInputPassword1">
+            <label for="password" class="form-label">Contraseña</label>
+            <input type="password" class="form-control" id="password">
           </div>
        
-          <button type="submit" class="btn btn-primary">Ingresar</button>
+          <button id="loginBtn" disabled type="submit" class="btn btn-primary">Ingresar</button>
         </form>
         
         <div id="loadingSpinner" class="text-center">
