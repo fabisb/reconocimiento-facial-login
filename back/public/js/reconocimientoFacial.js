@@ -64,5 +64,11 @@ autenticarBtn.addEventListener("click", async () => {
 });
 
 const fotoLogin = async ()=>{
+const pass=  document.getElementById('password').value;
+if (pass == 123) {
+  alert('simulacion de contraseña CORRECTA, puede ingresar...')
+}else{
 
+  alert('simulacion de contraseña INCORRECTA, NO puede ingresar...')
+}
 }

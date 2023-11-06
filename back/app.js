@@ -62,6 +62,7 @@ async function cargarImgRef() {
     );
   }
   faceMatcher = new faceapi.FaceMatcher(modelosFaces);
+  console.log('Imagenes de referencia cargadas')
 }
 cargarImgRef(); // Llamada a la función al iniciar la aplicación
 
