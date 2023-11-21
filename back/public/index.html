@@ -3,62 +3,105 @@
   <head>
     <title>Reconocimiento Facial</title>
   </head>
-  <link rel="stylesheet" href="/stylesheets/bootstrap.min.css">
-  <link rel="stylesheet" href="/stylesheets/style.css">
+  <link rel="stylesheet" href="/stylesheets/bootstrap.min.css" />
+  <link rel="stylesheet" href="/stylesheets/style.css" />
   <body>
     <main>
-
       <h1>Iniciar sesión con reconocimiento facial</h1>
       <video id="video" autoplay></video>
-      <button id="capturar">Capturar</button>
+      <button type="button" class="btn btn-primary" id="capturar">Capturar</button>
       <canvas id="canvas" width="320" height="240"></canvas>
-      
-      <button id="autenticar" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#loginModal">
+
+      <button
+        id="autenticar"
+        type="button"
+        class="btn btn-primary"
+        data-bs-toggle="modal"
+        data-bs-target="#loginModal"
+      >
         Ingresar
       </button>
     </main>
     <!-- Button trigger modal -->
 
+    <!-- Modal -->
+    <div
+      class="modal fade"
+      id="loginModal"
+      tabindex="-1"
+      aria-labelledby="loginModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="loginModalLabel">Login...</h1>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body" id="bodyModalLogin">
+            <form id="loginForm" onclick="fotoLogin()" hidden>
+              <div class="mb-3">
+                <div class="text-center">
+                  <figure class="figure">
+                    <img
+                      id="imgMatch"
+                      src="/images/example.png"
+                      height="350px"
+                      class="figure-img img-fluid rounded"
+                      alt="..."
+                    />
+                    <figcaption id="labelMatch" class="figure-caption">...</figcaption>
+                  </figure>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="password" class="form-label">Contraseña</label>
+                <input type="password" placeholder="123" class="form-control" id="password" />
+              </div>
 
-<!-- Modal -->
-<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="loginModalLabel">Login...</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body" id="bodyModalLogin">
-        <form id="loginForm" onclick="fotoLogin()" hidden>
-          <div class="mb-3">
-            <div class="text-center">
-            <figure class="figure">
+              <button id="loginBtn" disabled type="submit" class="btn btn-primary">Ingresar</button>
+            </form>
 
-                <img id="imgMatch" src="/images/example.png" height="350px" class="figure-img img-fluid rounded" alt="...">
-                <figcaption id="labelMatch" class="figure-caption">...</figcaption>
-              </figure>
+            <div id="loadingSpinner" class="text-center">
+              <div class="spinner-border m-5" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
             </div>
           </div>
-          <div class="mb-3">
-            <label for="password" class="form-label">Contraseña</label>
-            <input type="password" placeholder="123" class="form-control" id="password">
-          </div>
-       
-          <button id="loginBtn" disabled type="submit" class="btn btn-primary">Ingresar</button>
-        </form>
-        
-        <div id="loadingSpinner" class="text-center">
-          <div class="spinner-border m-5" role="status">
-            <span class="visually-hidden">Loading...</span>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
           </div>
         </div>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-      </div>
     </div>
-  </div>
+
+    <button
+      data-bs-toggle="modal"
+      data-bs-target="#manualModal"
+      type="button"
+      class="btn btn-primary"
+    >
+      MANUAL DE USUARIO
+    </button>
+    <div
+      class="modal fade"
+      id="manualModal"
+      tabindex="-1"
+      aria-labelledby="manualModalLabel"
+      aria-hidden="true"
+    >
+    <div class="modal-dialog modal-fullscreen">
+<div class="d-flex justify-content-center w-100 h-100">
+
+  <embed src="docs/manual.pdf" type="application/pdf"  width="95%" height="95%" />
 </div>
+    </div>
+    </div>
   </body>
   <script src="/modules/face-api.min.js"></script>
   <script src="/modules/axios.min.js"></script>

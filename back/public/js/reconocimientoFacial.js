@@ -60,6 +60,8 @@ autenticarBtn.addEventListener("click", async () => {
     if (error.data) {
       console.log(error.data);
     }
+  alert('ERROR AL IDENTIFICAR IMAGEN')
+
   }
 });
 
